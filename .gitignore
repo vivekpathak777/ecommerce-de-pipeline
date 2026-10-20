@@ -4,3 +4,12 @@ target/
 dbt_packages/
 logs/
 dbt_internal_packages/
+# Python virtual environment
+.venv/
+
+# Airflow local database, logs and configuration
+airflow_home/
+
+# Python generated files
+__pycache__/
+*.pyc

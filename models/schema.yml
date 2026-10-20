@@ -1,0 +1,32 @@
+version: 2
+
+models:
+  - name: fct_sales
+    description: "Sales fact table combining orders, products and payments"
+
+    columns:
+      - name: order_id
+        description: "Unique identifier for each order"
+        data_tests:
+          - unique
+          - not_null
+
+      - name: customer_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: source('ecommerce_silver', 'customers')
+                field: customer_id
+
+      - name: product_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: source('ecommerce_silver', 'products')
+                field: product_id
+
+      - name: revenue
+        data_tests:
+          - not_null

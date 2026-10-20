@@ -1,0 +1,12 @@
+version: 2
+
+sources:
+  - name: ecommerce_silver
+    database: demo_ecommerce
+    schema: ecomm_silver
+
+    tables:
+      - name: customers
+      - name: products
+      - name: orders
+      - name: payments

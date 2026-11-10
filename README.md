@@ -12,7 +12,7 @@ The project demonstrates batch ingestion, distributed data processing, SQL-based
 
 ## 🏗️ 1. Project Architecture
 
-![EcomKart Data Engineering Architecture](assets/architecture.png)
+![EcomKart Data Engineering Architecture](architecture.png)
 
 ### 🔄 Data Flow
 

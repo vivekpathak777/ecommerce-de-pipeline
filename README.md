@@ -189,7 +189,7 @@ The project implements:
 
 ### 🔗 dbt Lineage
 
-![dbt Model Lineage](assets/dbt_lineage.png)
+![dbt Model Lineage](dbt_lineage.png)
 
 The lineage graph shows dependencies between Silver sources, `fct_sales`, and `monthly_sales`.
 
@@ -239,7 +239,7 @@ Airflow coordinates Databricks and dbt Cloud through their APIs.
 
 ### 📸 Successful Airflow Execution
 
-![Successful Airflow DAG](assets/airflow_success.png)
+![Successful Airflow DAG](airflow_success.png)
 
 **Validated execution:** Both orchestration tasks completed successfully in approximately **3 minutes and 5 seconds**.
 
@@ -253,7 +253,7 @@ Power BI connects to the Databricks SQL Warehouse and imports the Gold tables.
 
 ### 📈 Dashboard Preview
 
-![EcomKart Power BI Dashboard](assets/powerbi_dashboard.png)
+![EcomKart Power BI Dashboard](powerbi_dashboard.png)
 
 ### Business KPIs
 
@@ -284,7 +284,6 @@ Power BI uses Import mode, so a dataset refresh is required to retrieve updated 
 ```text
 ecommerce-de-pipeline/
 │
-├── assets/
 │   ├── architecture.png
 │   ├── airflow_success.png
 │   ├── dbt_lineage.png
@@ -318,7 +317,7 @@ ecommerce-de-pipeline/
 └── README.md
 ```
 
-The structure above highlights the main project files and intended screenshot assets. The repository may also contain standard dbt directories and configuration files.
+The structure above highlights the main project files and intended screenshot. The repository may also contain standard dbt directories and configuration files.
 
 ---
 

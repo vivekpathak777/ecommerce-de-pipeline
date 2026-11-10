@@ -1,221 +1,376 @@
-# End-to-End E-Commerce Data Engineering Pipeline
+# 🛒 EcomKart | End-to-End Data Engineering & Analytics Pipeline
 
-An end-to-end data engineering project built using **Databricks, Delta Lake, Apache Spark, dbt Cloud, Apache Airflow, Python, SQL, and GitHub**.
+### 🚀 Databricks • PySpark • Delta Lake • dbt • Apache Airflow • Power BI
 
-The project processes synthetic e-commerce datasets through a Medallion Architecture (Bronze, Silver, Gold), applies data quality tests, and orchestrates the complete workflow using Apache Airflow.
+An end-to-end e-commerce data engineering project that transforms raw CSV datasets into analytics-ready business insights using a **Medallion Architecture (Bronze → Silver → Gold)**.
 
-## Architecture
+The project demonstrates batch ingestion, distributed data processing, SQL-based transformations, data quality testing, workflow orchestration, and business intelligence reporting.
+
+**🔗 [GitHub Repository](https://github.com/vivekpathak777/ecommerce-de-pipeline)**
+
+---
+
+## 🏗️ 1. Project Architecture
+
+![EcomKart Data Engineering Architecture](assets/architecture.png)
+
+### 🔄 Data Flow
 
 ```text
-Synthetic E-Commerce CSV Files
-              |
-              v
-     Databricks Unity Catalog
-          Volume Storage
-              |
-              v
-      BRONZE LAYER
-   Raw Data Ingestion
-   PySpark + Delta Lake
-              |
-              v
-      SILVER LAYER
-   Cleaning & Transformation
-   PySpark + Delta Lake
-              |
-              v
-       GOLD LAYER
-    dbt Cloud + SQL
+🛒 Synthetic E-Commerce Data
+          |
+          v
+📁 CSV Files (Customers, Products, Orders, Payments)
+          |
+          v
+☁️ Databricks Unity Catalog Volume
+          |
+          v
+🥉 BRONZE LAYER
+   PySpark Raw Data Ingestion
+   Delta Lake Tables
+          |
+          v
+🥈 SILVER LAYER
+   Data Cleaning & Validation
+   Type Casting & Deduplication
+          |
+          v
+🥇 GOLD LAYER
+   dbt SQL Models
    Fact Tables & Aggregations
-              |
-              v
-     Analytics-Ready Tables
+   Data Quality Tests
+          |
+          v
+📊 POWER BI
+   Interactive Sales Analytics Dashboard
 ```
 
-**Orchestration:** Apache Airflow triggers the Databricks Bronze/Silver job, waits for successful completion, then triggers the dbt Cloud Gold transformation job.
+**⚙️ Orchestration:** Apache Airflow triggers the Databricks Bronze/Silver job, waits for completion, and then triggers the dbt Cloud Gold transformation job.
 
-## Technology Stack
+---
+
+## 🎯 2. Business Problem
+
+E-commerce businesses generate data from customers, orders, products, and payments.
+
+Raw data alone is not suitable for reliable business reporting. It must be ingested, cleaned, validated, transformed, and made available for analysis.
+
+### 💡 Our Solution
+
+EcomKart implements a lakehouse-based data pipeline that:
+
+- 📥 Ingests raw e-commerce CSV files.
+- 🧹 Cleans and standardizes data using PySpark.
+- 🗄️ Stores data in Delta Lake tables.
+- 🔗 Creates analytical models using dbt.
+- 🧪 Validates data quality.
+- ⚙️ Orchestrates processing using Apache Airflow.
+- 📊 Visualizes business performance in Power BI.
+
+---
+
+## 🛠️ 3. Technology Stack
 
 | Technology | Purpose |
 |---|---|
-| Python | Synthetic data generation and pipeline logic |
-| Databricks | Distributed data processing |
-| PySpark | Data ingestion and transformations |
-| Delta Lake | Reliable lakehouse table storage |
-| Unity Catalog | Data organization and governance |
-| dbt Cloud | SQL transformations and data quality testing |
-| Apache Airflow | Workflow orchestration and monitoring |
-| GitHub | Version control and code management |
-| GitHub Codespaces | Cloud development environment |
+| 🐍 Python | Synthetic data generation and API orchestration |
+| ⚡ PySpark | Distributed data transformations |
+| 🧱 Databricks | Lakehouse processing platform |
+| 🗄️ Delta Lake | Reliable table storage |
+| 🔐 Unity Catalog | Catalog, schema and Volume management |
+| 🔶 dbt | SQL modeling, lineage and data quality tests |
+| 🌬️ Apache Airflow | Workflow orchestration |
+| 📊 Power BI | Business intelligence dashboard |
+| 🐙 GitHub | Version control and documentation |
+| 💻 GitHub Codespaces | Cloud-based development environment |
 
-## Dataset
+---
 
-Four synthetic e-commerce datasets are used:
+## 📁 4. Dataset
+
+Four synthetic datasets represent a simplified e-commerce system.
 
 | Dataset | Description |
 |---|---|
-| `customers.csv` | Customer information |
-| `products.csv` | Product information and prices |
-| `orders.csv` | Customer orders |
-| `payments.csv` | Payment information and status |
+| 👥 `customers.csv` | Customer IDs, names, cities and emails |
+| 📦 `products.csv` | Product details, categories and prices |
+| 🛍️ `orders.csv` | Order details, quantities and statuses |
+| 💳 `payments.csv` | Payment transactions, methods and statuses |
 
-The datasets are generated for demonstration purposes and do not contain real customer information.
+The source data was generated using `scripts/generate_data.py`.
 
-## Data Pipeline
+Initial CSV files were uploaded manually to a Databricks Unity Catalog Volume.
 
-### 1. Bronze Layer — Raw Data Ingestion
+---
+
+## 🥉 5. Bronze Layer — Raw Data Ingestion
 
 **Notebook:** `databricks/01_bronze_ingestion.py`
 
-- Reads CSV files from a Databricks Unity Catalog Volume.
-- Loads raw data using PySpark.
-- Stores the data as Delta tables.
-- Preserves the raw source structure for downstream processing.
+The Bronze layer reads CSV files from a Unity Catalog Volume and stores them as managed Delta tables.
 
-### 2. Silver Layer — Data Cleaning
+### Key Operations
+
+- Read raw CSV files using PySpark.
+- Preserve source columns as strings.
+- Create managed Delta tables.
+- Verify ingested record counts.
+
+**Bronze tables:**
+
+```text
+demo_ecommerce.ecomm_bronze.customers
+demo_ecommerce.ecomm_bronze.products
+demo_ecommerce.ecomm_bronze.orders
+demo_ecommerce.ecomm_bronze.payments
+```
+
+The current implementation uses full-table overwrite rather than incremental ingestion.
+
+---
+
+## 🥈 6. Silver Layer — Data Cleaning
 
 **Notebook:** `databricks/02_silver_transformation.py`
 
-- Reads Bronze Delta tables.
-- Applies cleaning and type conversions.
-- Removes duplicate records.
-- Produces structured Silver tables.
+The Silver layer transforms raw Bronze records into cleaned, structured datasets.
 
-### 3. Gold Layer — dbt Transformations
+### Transformations
 
-**Models:** `models/`
+- 🔢 Convert IDs and numeric fields to appropriate data types.
+- 📅 Standardize date columns.
+- 🧹 Trim text fields and normalize emails.
+- 🚫 Filter invalid records.
+- 🔍 Deduplicate records using business identifiers.
+- ⏱️ Add processing timestamps.
+- 🔗 Validate relationships across datasets.
 
-**`fct_sales.sql`**
+Silver tables are rebuilt from the complete Bronze datasets.
 
-Combines order, product and payment data to create an analytics-ready sales fact table.
+---
 
-**`monthly_sales.sql`**
+## 🥇 7. Gold Layer — dbt Transformations
 
-Aggregates order-level data into monthly metrics:
+The Gold layer uses dbt SQL models to create business-ready datasets.
 
+### 📌 `fct_sales`
+
+Combines order, product, and payment information.
+
+Includes:
+
+- Order and customer identifiers
+- Product and category
+- Order quantity and price
+- Order and payment statuses
+- Calculated revenue
+
+### 📌 `monthly_sales`
+
+Aggregates sales into monthly business metrics.
+
+Includes:
+
+- Sales month
 - Total orders
 - Completed orders
 - Total revenue
 
-Gold tables are materialized in Databricks using dbt.
+### 🧪 dbt Data Quality Tests
 
-### 4. Data Quality Testing
+The project implements:
 
-dbt tests validate the transformed data, including:
+| Test | Purpose |
+|---|---|
+| `unique` | Verify unique identifiers |
+| `not_null` | Validate required fields |
+| `relationships` | Validate foreign-key relationships |
 
-- `unique` — Checks that identifiers are unique.
-- `not_null` — Checks required fields.
-- `relationships` — Checks referential integrity between related datasets.
+### 🔗 dbt Lineage
 
-The tests run as part of the dbt build process.
+![dbt Model Lineage](assets/dbt_lineage.png)
 
-### 5. Apache Airflow Orchestration
+The lineage graph shows dependencies between Silver sources, `fct_sales`, and `monthly_sales`.
+
+---
+
+## 🌬️ 8. Apache Airflow Orchestration
 
 **DAG:** `dags/ecommerce_pipeline.py`
 
-The Airflow DAG contains two main tasks:
+Airflow coordinates Databricks and dbt Cloud through their APIs.
 
-1. `run_databricks_etl` — Triggers the Databricks job that executes Bronze ingestion followed by Silver transformation.
-2. `run_dbt_gold` — Triggers the dbt Cloud deployment job that builds Gold models and runs tests.
+### Execution Flow
 
-Airflow waits for successful completion before executing the next task.
+```text
+          ▶️ Manual DAG Trigger
+                    |
+                    v
+          run_databricks_etl
+                    |
+           Databricks Job API
+                    |
+           Bronze → Silver
+                    |
+             Success Check
+                    |
+                    v
+              run_dbt_gold
+                    |
+             dbt Cloud API
+                    |
+         Gold Models + dbt Tests
+                    |
+             Success Check
+                    |
+                    v
+          ✅ Pipeline Completed
+```
 
-The DAG supports manual triggering, retries, timeout handling, and task execution monitoring.
+### ⚙️ Airflow Features
 
-## Project Structure
+- Task dependencies
+- API-based job triggering
+- Remote job status polling
+- Retry configuration
+- Execution timeouts
+- Task logs and monitoring
+
+### 📸 Successful Airflow Execution
+
+![Successful Airflow DAG](assets/airflow_success.png)
+
+**Validated execution:** Both orchestration tasks completed successfully in approximately **3 minutes and 5 seconds**.
+
+The DAG is manually triggered in the current implementation.
+
+---
+
+## 📊 9. Power BI — EcomKart Sales Dashboard
+
+Power BI connects to the Databricks SQL Warehouse and imports the Gold tables.
+
+### 📈 Dashboard Preview
+
+![EcomKart Power BI Dashboard](assets/powerbi_dashboard.png)
+
+### Business KPIs
+
+| KPI | Observed Value |
+|---|---:|
+| 💰 Total Revenue | $11.09M |
+| 🛍️ Total Orders | 500 |
+| ✅ Completed Orders | 144 |
+| 📊 Order Completion Rate | 28.80% |
+| 💵 Average Order Value | 77.04K |
+
+*Values reflect the demonstration dataset at the time of dashboard creation. Currency presentation follows the Power BI report configuration.*
+
+### Dashboard Visualizations
+
+- 📅 Monthly Revenue Trend
+- 💳 Revenue by Payment Method
+- 🏷️ Revenue by Product Category
+- 🏆 Top 5 Products by Revenue
+- 📌 Business KPI Cards
+
+Power BI uses Import mode, so a dataset refresh is required to retrieve updated Databricks data.
+
+---
+
+## 📂 10. Repository Structure
 
 ```text
 ecommerce-de-pipeline/
-|
-|-- dags/
-|   |-- ecommerce_pipeline.py
-|   |-- hello_airflow.py
-|
-|-- databricks/
-|   |-- 01_bronze_ingestion.py
-|   |-- 02_silver_transformation.py
-|
-|-- models/
-|   |-- fct_sales.sql
-|   |-- monthly_sales.sql
-|   |-- schema.yml
-|   |-- sources.yml
-|
-|-- data/
-|   |-- customers.csv
-|   |-- products.csv
-|   |-- orders.csv
-|   |-- payments.csv
-|
-|-- scripts/
-|   |-- generate_data.py
-|
-|-- dbt_project.yml
-|-- .gitignore
-|-- README.md
+│
+├── assets/
+│   ├── architecture.png
+│   ├── airflow_success.png
+│   ├── dbt_lineage.png
+│   └── powerbi_dashboard.png
+│
+├── dags/
+│   ├── ecommerce_pipeline.py
+│   └── hello_airflow.py
+│
+├── databricks/
+│   ├── 01_bronze_ingestion.py
+│   └── 02_silver_transformation.py
+│
+├── models/
+│   ├── fct_sales.sql
+│   ├── monthly_sales.sql
+│   ├── schema.yml
+│   └── sources.yml
+│
+├── data/
+│   ├── customers.csv
+│   ├── products.csv
+│   ├── orders.csv
+│   └── payments.csv
+│
+├── scripts/
+│   └── generate_data.py
+│
+├── dbt_project.yml
+├── .gitignore
+└── README.md
 ```
 
-## Execution
+The structure above highlights the main project files and intended screenshot assets. The repository may also contain standard dbt directories and configuration files.
 
-The pipeline was successfully executed manually through Apache Airflow.
+---
 
-**Execution sequence:**
+## 🚀 11. How to Run the Project
 
-```text
-Airflow DAG Triggered
-         |
-         v
-run_databricks_etl
-         |
-         v
-Databricks Bronze Ingestion
-         |
-         v
-Databricks Silver Transformation
-         |
-         v
-run_dbt_gold
-         |
-         v
-dbt Gold Models + Data Tests
-         |
-         v
-    Pipeline Success
-```
+### Prerequisites
 
-### Validation Results
+- Databricks workspace and SQL Warehouse
+- Unity Catalog access
+- dbt project and execution environment
+- Apache Airflow
+- Python dependencies
+- Power BI Desktop
 
-- Databricks Bronze and Silver job completed successfully.
-- dbt Gold transformations and data quality tests completed successfully.
-- Airflow completed both orchestration tasks successfully.
-- End-to-end DAG execution time: approximately 3 minutes and 5 seconds.
+### Execution Steps
 
-## Running the Project
+1. Generate synthetic datasets using the Python generator.
+2. Upload the CSV files to the configured Databricks Volume.
+3. Configure Bronze and Silver Databricks notebooks.
+4. Configure dbt models and data quality tests.
+5. Create a Databricks job for Bronze and Silver processing.
+6. Configure a dbt deployment job or equivalent dbt execution.
+7. Set up Airflow connections for Databricks and dbt.
+8. Update environment-specific account and job IDs in the Airflow DAG.
+9. Trigger `ecommerce_end_to_end_pipeline`.
+10. Verify successful execution and refresh Power BI.
 
-This project requires access to a configured Databricks workspace, a dbt Cloud deployment job, and an Apache Airflow environment.
+**🔐 Security:** API tokens and credentials are managed outside source control. Never commit credentials, Airflow metadata databases or virtual environments to GitHub.
 
-1. Generate or upload the synthetic datasets.
-2. Configure the Databricks catalog, schemas, and Volume.
-3. Configure the Databricks notebook job for Bronze and Silver.
-4. Configure dbt Cloud to build Gold models in Databricks.
-5. Set up Airflow with the required dependencies.
-6. Create Airflow connections named `databricks_api` and `dbt_cloud_api`, with valid API credentials.
-7. Update the job and account identifiers in `dags/ecommerce_pipeline.py` for your environment.
-8. Start Airflow and manually trigger `ecommerce_end_to_end_pipeline`.
+---
 
-**Security:** API tokens and credentials must be stored securely in Airflow Connections, not committed to GitHub.
+## 🔮 12. Future Improvements
 
-## Future Improvements
+- 🔄 Incremental Bronze ingestion using Delta MERGE
+- ☁️ Automated file ingestion from object storage
+- 📅 Scheduled Airflow executions
+- 🔔 Failure notifications and alerting
+- 📈 Incremental dbt models
+- 🧪 Automated CI/CD checks
+- 📊 Automated Power BI refresh
+- 🏭 Production-grade deployment and monitoring
 
-- Automatic pipeline scheduling
-- Incremental ingestion and processing
-- Monitoring and failure notifications
-- CI/CD testing and deployment
-- Parameterized configuration for multiple environments
-- Improved scalability and production-ready infrastructure
+---
 
-## Project Outcome
+## 🏆 13. Project Outcome
 
-Successfully built and executed a complete data engineering pipeline integrating Databricks, Delta Lake, dbt Cloud, and Apache Airflow, with GitHub-based version control.
+Successfully designed, implemented and tested a manually triggered end-to-end batch data engineering pipeline.
 
-The project demonstrates practical experience in data ingestion, lakehouse architecture, SQL transformations, data quality validation, API integration, and workflow orchestration.
+The project demonstrates practical experience in:
+
+**Data ingestion • PySpark transformations • Delta Lake • Medallion Architecture • dbt modeling • Data quality • REST API orchestration • Airflow • Power BI • GitHub**
+
+### ⭐ Thank you for exploring EcomKart!
+
+*From raw e-commerce data to business-ready analytics.*
